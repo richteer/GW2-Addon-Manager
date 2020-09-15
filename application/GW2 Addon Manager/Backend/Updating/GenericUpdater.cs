@@ -210,10 +210,12 @@ namespace GW2_Addon_Manager
         public static void Disable(AddonInfoFromYaml addon_info)
         {
             UserConfig info = Configuration.getConfigAsYAML();
+            string disabled_path = Path.Combine(info.game_path, "addons", "Disabled Plugins");
+
             if (info.installed.ContainsKey(addon_info.folder_name) && info.installed[addon_info.folder_name] != null)
             {
-                if (!Directory.Exists("Disabled Plugins"))
-                    Directory.CreateDirectory("Disabled Plugins");
+                if (!Directory.Exists(disabled_path))
+                    Directory.CreateDirectory(disabled_path);
 
                 if (info.disabled.ContainsKey(addon_info.folder_name) && !info.disabled[addon_info.folder_name])
                 {
@@ -221,14 +223,14 @@ namespace GW2_Addon_Manager
                     {
                         Directory.Move(
                             Path.Combine(Path.Combine(info.game_path, "addons"), addon_info.folder_name),
-                            Path.Combine("Disabled Plugins", addon_info.folder_name)
+                            Path.Combine(disabled_path, addon_info.folder_name)
                             );
                     }
                     else
                     {
                         //probably broken
-                        if (!Directory.Exists(Path.Combine("Disabled Plugins", addon_info.folder_name)))
-                            Directory.CreateDirectory(Path.Combine("Disabled Plugins", addon_info.folder_name));
+                        if (!Directory.Exists(Path.Combine(disabled_path, addon_info.folder_name)))
+                            Directory.CreateDirectory(Path.Combine(disabled_path, addon_info.folder_name));
 
                         if (addon_info.addon_name.Contains("BuildPad"))
                         {
@@ -243,14 +245,14 @@ namespace GW2_Addon_Manager
 
                             File.Move(
                                 Path.Combine(Path.Combine(Path.Combine(info.game_path, "addons"), "arcdps"), buildPadFileName),
-                                Path.Combine(Path.Combine("Disabled Plugins", addon_info.folder_name), buildPadFileName)
+                                Path.Combine(Path.Combine(disabled_path, addon_info.folder_name), buildPadFileName)
                                 );
                         }
                         else
                         {
                             File.Move(
                                 Path.Combine(Path.Combine(Path.Combine(info.game_path, "addons"), "arcdps"), addon_info.plugin_name),
-                                Path.Combine(Path.Combine("Disabled Plugins", addon_info.folder_name), addon_info.plugin_name)
+                                Path.Combine(Path.Combine(disabled_path, addon_info.folder_name), addon_info.plugin_name)
                                 );
                         }
                     }
@@ -265,6 +267,8 @@ namespace GW2_Addon_Manager
         public static void enable(AddonInfoFromYaml addon_info)
         {
             UserConfig info = Configuration.getConfigAsYAML();
+            string disabled_path = Path.Combine(info.game_path, "addons", "Disabled Plugins");
+
             if (info.installed.ContainsKey(addon_info.folder_name) && info.installed[addon_info.folder_name] != null)
             {
                 if (info.disabled.ContainsKey(addon_info.folder_name) && info.disabled[addon_info.folder_name])
@@ -274,7 +278,7 @@ namespace GW2_Addon_Manager
                     {
                         //non-arc
                         Directory.Move(
-                        Path.Combine("Disabled Plugins", addon_info.folder_name),
+                        Path.Combine(disabled_path, addon_info.folder_name),
                         Path.Combine(Path.Combine(info.game_path, "addons"), addon_info.folder_name)
                         );
                     }
@@ -289,7 +293,7 @@ namespace GW2_Addon_Manager
                         {
                             //non-buildpad
                             File.Move(
-                                Path.Combine(Path.Combine("Disabled Plugins", addon_info.folder_name), addon_info.plugin_name),
+                                Path.Combine(Path.Combine(disabled_path, addon_info.folder_name), addon_info.plugin_name),
                                 Path.Combine(Path.Combine(Path.Combine(info.game_path, "addons"), "arcdps"), addon_info.plugin_name)
                                 );
                         }
@@ -297,14 +301,14 @@ namespace GW2_Addon_Manager
                         {
                             //buildpad
                             string buildPadFileName = "";
-                            string[] buildPadFiles = Directory.GetFiles(Path.Combine("Disabled Plugins", addon_info.folder_name));
+                            string[] buildPadFiles = Directory.GetFiles(Path.Combine(disabled_path, addon_info.folder_name));
 
                             foreach (string someFileName in buildPadFiles)
                                 if (someFileName.Contains("buildpad"))
                                     buildPadFileName = Path.GetFileName(someFileName);
 
                             File.Move(
-                                Path.Combine(Path.Combine("Disabled Plugins", addon_info.folder_name), buildPadFileName),
+                                Path.Combine(Path.Combine(disabled_path, addon_info.folder_name), buildPadFileName),
                                 Path.Combine(Path.Combine(Path.Combine(info.game_path, "addons"), "arcdps"), buildPadFileName)
                                 );
                         }
@@ -322,11 +326,13 @@ namespace GW2_Addon_Manager
         public static void delete(AddonInfoFromYaml addon_info)
         {
             UserConfig info = Configuration.getConfigAsYAML();
+            string disabled_path = Path.Combine(info.game_path, "addons", "Disabled Plugins");
+
             if (info.installed.ContainsKey(addon_info.folder_name) && info.installed[addon_info.folder_name] != null)
             {
                 if (info.disabled.ContainsKey(addon_info.folder_name) && info.disabled[addon_info.folder_name])
                 {
-                    FileSystem.DeleteDirectory(Path.Combine("Disabled Plugins", addon_info.folder_name), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    FileSystem.DeleteDirectory(Path.Combine(disabled_path, addon_info.folder_name), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                     info.disabled.Remove(addon_info.folder_name);
                     info.installed.Remove(addon_info.folder_name);
                     info.version.Remove(addon_info.folder_name);
